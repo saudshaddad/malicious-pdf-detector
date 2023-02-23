@@ -1,13 +1,10 @@
-// package maliciouspdfdetector
+package maliciouspdfdetector
 
-package main
+// package main
 
 import (
-	"bytes"
-	"compress/zlib"
 	"fmt"
 	"os"
-	"regexp"
 )
 
 type PDFFile struct {
@@ -48,14 +45,8 @@ func (f *PDFFile) ParsePdfFile() {
 	}
 
 	for _, b := range f.bytes {
-
 		for key, value := range keywordsMap {
 			if b == value.bytes[value.currentProgress] {
-				// if value.currentProgress == 0 {
-				// 	if !((f.bytes[index-1] == 10) || (f.bytes[index-1] == 32)) {
-				// 		continue
-				// 	}
-				// }
 				value.currentProgress++
 			} else {
 				value.currentProgress = 0
@@ -71,41 +62,11 @@ func (f *PDFFile) ParsePdfFile() {
 				keywordsMap[key] = value
 			}
 		}
-
 	}
 
 	for key, value := range keywordsMap {
-		fmt.Println(key, value.count)
 		f.keywordsCount[key] = value.count
 	}
-}
-
-func (f *PDFFile) FindStreams() {
-	var reg = regexp.MustCompile(`stream\n(.*\n)+?endstream`)
-	// var reg = regexp.MustCompile(`stream(.*\n).+?(?=\nendstream)`)
-
-	// (?<=stream\n)(.*\n).+?(?=\nendstream)
-
-	found := reg.FindAll(f.bytes, -1)
-
-	fmt.Println("found: ", len(found))
-	for index, by := range found {
-		// convert byte slice to io.Reader
-		sanitizedBytes := by[7 : len(by)-11]
-
-		reader := bytes.NewReader(sanitizedBytes)
-
-		r, err := zlib.NewReader(reader)
-		if err != nil {
-			fmt.Println("---------------------------------- ", index+1)
-			fmt.Println(err)
-			continue
-		}
-		fmt.Println("---------------------------------- ", index+1)
-		// io.Copy(os.Stdout, r)
-		r.Close()
-	}
-
 }
 
 func (f *PDFFile) IsMalicious() bool {
@@ -134,21 +95,6 @@ type KeywordData struct {
 	bytes           []byte
 }
 
-func main() {
-	PDFFile := NewPDFFile("sample-mal.pdf")
-
-	err := PDFFile.ReadFile()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(len(PDFFile.bytes))
-	PDFFile.ParsePdfFile()
-
-	PDFFile.FindStreams()
-	fmt.Println(PDFFile.IsMalicious())
-}
-
 var keywords []([]byte) = []([]byte){
 	[]byte("obj"),
 	[]byte("stream"),
@@ -170,3 +116,67 @@ var keywords []([]byte) = []([]byte){
 	[]byte("/XFA"),
 	[]byte("/Colors > 2^24"),
 }
+
+// func (f *PDFFile) passThrough() {
+
+// 	objBytesCount := 0
+// 	// probablyInsideObject := false
+// 	isInsideObject := false
+
+// 	for pos, b := range f.bytes {
+
+// 		if isInsideObject {
+// 			fmt.Println(b, f.bytes[pos+1])
+// 			isInsideObject = false
+// 		}
+
+// 		switch b {
+// 		case 'o':
+// 			if objBytesCount == 0 {
+// 				objBytesCount++
+// 			} else {
+// 				objBytesCount = 0
+// 			}
+// 		case 'b':
+// 			if objBytesCount == 1 {
+// 				objBytesCount++
+// 			} else {
+// 				objBytesCount = 0
+// 			}
+// 		case 'j':
+// 			if objBytesCount == 2 {
+// 				objBytesCount = 0
+// 				// probablyInsideObject = true
+// 			}
+// 		default:
+// 			objBytesCount = 0
+// 		}
+// 	}
+// }
+
+// func (f *PDFFile) FindStreams() {
+// 	var reg = regexp.MustCompile(`stream\n(.*\n)+?endstream`)
+// 	// var reg = regexp.MustCompile(`stream(.*\n).+?(?=\nendstream)`)
+
+// 	// (?<=stream\n)(.*\n).+?(?=\nendstream)
+
+// 	found := reg.FindAll(f.bytes, -1)
+
+// 	fmt.Println("found: ", len(found))
+// 	for index, by := range found {
+// 		// convert byte slice to io.Reader
+// 		sanitizedBytes := by[7 : len(by)-11]
+
+// 		reader := bytes.NewReader(sanitizedBytes)
+
+// 		r, err := zlib.NewReader(reader)
+// 		if err != nil {
+// 			fmt.Println("---------------------------------- ", index+1)
+// 			fmt.Println(err)
+// 			continue
+// 		}
+// 		fmt.Println("---------------------------------- ", index+1)
+// 		io.Copy(os.Stdout, r)
+// 		r.Close()
+// 	}
+// }
