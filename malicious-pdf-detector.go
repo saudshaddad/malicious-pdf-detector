@@ -18,6 +18,7 @@ func NewPDFFile(uri string) *PDFFile {
 	}
 }
 
+// read the content of the file before parsing it
 func (f *PDFFile) ReadFile() error {
 	var err error
 	f.bytes, err = os.ReadFile(f.Uri)
@@ -28,6 +29,7 @@ func (f *PDFFile) ReadFile() error {
 	return nil
 }
 
+// parse the file content for malicious content
 func (f *PDFFile) ParsePdfFile() {
 
 	keywordsMap := make(map[string]keywordData)
@@ -66,6 +68,7 @@ func (f *PDFFile) ParsePdfFile() {
 	}
 }
 
+// get the result of the parsing
 func (f *PDFFile) IsMalicious() bool {
 	for key, count := range f.keywordsCount {
 		if count > 0 {
