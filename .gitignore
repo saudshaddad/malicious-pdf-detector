@@ -24,3 +24,5 @@ example/.DS_Store
 
 # Go workspace file
 go.work
+
+stash

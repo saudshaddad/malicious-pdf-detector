@@ -7,13 +7,25 @@ import (
 )
 
 func main() {
-	PDFFile := maliciouspdfdetector.NewPDFFile("sample.pdf")
+	// initiate a new detector from the file URL
+	PDFFile := maliciouspdfdetector.NewPDFFile("sample-mal.pdf")
 
+	// read the file
 	err := PDFFile.ReadFile()
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
+	// call the parse method
 	PDFFile.ParsePdfFile()
-	fmt.Println(PDFFile.IsMalicious())
+
+	// check the file if malicious or not
+	if PDFFile.IsMalicious() {
+		// the file is probably malicious, exit!
+		fmt.Println("The file is probably malicious")
+		return
+	}
+
+	fmt.Println("The file passed the test")
 }
