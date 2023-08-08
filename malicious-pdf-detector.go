@@ -1,9 +1,6 @@
 package maliciouspdfdetector
 
-// package main
-
 import (
-	"fmt"
 	"os"
 )
 
@@ -13,6 +10,7 @@ type PDFFile struct {
 	keywordsCount map[string]int
 }
 
+// Initiate a new malicious detector from a PDF file URL
 func NewPDFFile(uri string) *PDFFile {
 	return &PDFFile{
 		Uri:           uri,
@@ -24,7 +22,6 @@ func (f *PDFFile) ReadFile() error {
 	var err error
 	f.bytes, err = os.ReadFile(f.Uri)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
@@ -33,10 +30,10 @@ func (f *PDFFile) ReadFile() error {
 
 func (f *PDFFile) ParsePdfFile() {
 
-	keywordsMap := make(map[string]KeywordData)
+	keywordsMap := make(map[string]keywordData)
 
 	for _, b := range keywords {
-		keywordsMap[string(b)] = KeywordData{
+		keywordsMap[string(b)] = keywordData{
 			count:           0,
 			length:          len(b),
 			currentProgress: 0,
@@ -88,7 +85,7 @@ func (f *PDFFile) IsMalicious() bool {
 	return false
 }
 
-type KeywordData struct {
+type keywordData struct {
 	count           int
 	length          int
 	currentProgress int
@@ -116,67 +113,3 @@ var keywords []([]byte) = []([]byte){
 	[]byte("/XFA"),
 	[]byte("/Colors > 2^24"),
 }
-
-// func (f *PDFFile) passThrough() {
-
-// 	objBytesCount := 0
-// 	// probablyInsideObject := false
-// 	isInsideObject := false
-
-// 	for pos, b := range f.bytes {
-
-// 		if isInsideObject {
-// 			fmt.Println(b, f.bytes[pos+1])
-// 			isInsideObject = false
-// 		}
-
-// 		switch b {
-// 		case 'o':
-// 			if objBytesCount == 0 {
-// 				objBytesCount++
-// 			} else {
-// 				objBytesCount = 0
-// 			}
-// 		case 'b':
-// 			if objBytesCount == 1 {
-// 				objBytesCount++
-// 			} else {
-// 				objBytesCount = 0
-// 			}
-// 		case 'j':
-// 			if objBytesCount == 2 {
-// 				objBytesCount = 0
-// 				// probablyInsideObject = true
-// 			}
-// 		default:
-// 			objBytesCount = 0
-// 		}
-// 	}
-// }
-
-// func (f *PDFFile) FindStreams() {
-// 	var reg = regexp.MustCompile(`stream\n(.*\n)+?endstream`)
-// 	// var reg = regexp.MustCompile(`stream(.*\n).+?(?=\nendstream)`)
-
-// 	// (?<=stream\n)(.*\n).+?(?=\nendstream)
-
-// 	found := reg.FindAll(f.bytes, -1)
-
-// 	fmt.Println("found: ", len(found))
-// 	for index, by := range found {
-// 		// convert byte slice to io.Reader
-// 		sanitizedBytes := by[7 : len(by)-11]
-
-// 		reader := bytes.NewReader(sanitizedBytes)
-
-// 		r, err := zlib.NewReader(reader)
-// 		if err != nil {
-// 			fmt.Println("---------------------------------- ", index+1)
-// 			fmt.Println(err)
-// 			continue
-// 		}
-// 		fmt.Println("---------------------------------- ", index+1)
-// 		io.Copy(os.Stdout, r)
-// 		r.Close()
-// 	}
-// }
