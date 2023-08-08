@@ -9,6 +9,7 @@ import (
 func main() {
 	// initiate a new detector from the file URL
 	PDFFile := maliciouspdfdetector.NewPDFFile("sample-mal.pdf")
+	// PDFFile := maliciouspdfdetector.NewPDFFile("sample-clean.pdf")
 
 	// read the file
 	err := PDFFile.ReadFile()

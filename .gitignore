@@ -4,7 +4,6 @@
 
 .DS_Store
 example/.DS_Store
-*.pdf
 
 # Binaries for programs and plugins
 *.exe
